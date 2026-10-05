@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRP System • Família & Operações</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0b090a;
+  --card: #171113;
+  --card2: #24181a;
+  --border: #4a282d;
+  --green: #d8ad57;
+  --green-dark: #956b35;
+  --purple: #963d4a;
+  --blue: #b0804a;
+  --gold: #e6bd67;
+  --red: #c84b45;
+  --white: #f6eee4;
+  --muted: #b5a38f;
+}
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100vh;
+  padding: 16px;
+  padding-bottom: 100px;
+  background-image:
+    radial-gradient(circle at 12% 0%, rgba(122,31,45,0.26), transparent 42%),
+    radial-gradient(circle at 88% 8%, rgba(216,173,87,0.13), transparent 38%),
+    radial-gradient(circle at 50% 100%, rgba(79,43,36,0.17), transparent 52%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 7px);
+  background-attachment: fixed;
+}
+.container { max-width: 760px; margin: 0 auto; }
+
+/* HEADER */
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.logo {
+  font-size: 22px; font-weight: 900; letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--gold), #9b3d4a);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.clock { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* HERO CARD */
+.hero {
+  background: linear-gradient(145deg, var(--card), var(--card2));
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -50%; right: -20%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(216,173,87,0.18), transparent 70%);
+  pointer-events: none;
+}
+.hero-label { font-size: 12px; color: var(--green); font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+.hero-title { font-size: 20px; margin: 6px 0 14px; font-weight: 800; }
+.hero-total {
+  font-size: 38px; font-weight: 900;
+  background: linear-gradient(90deg, var(--gold), #fff0c6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+}
+.progress-track {
+  height: 14px; background: #0a1020; border-radius: 99px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--green-dark), var(--green), var(--gold));
+  border-radius: 99px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 20px rgba(34,229,138,0.5);
+}
+.progress-info {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: var(--muted); margin-top: 8px; font-weight: 600;
+}
+
+/* STATS GRID */
+.stats {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;
+}
+@media (min-width: 600px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 14px;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: var(--green); }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 20px; font-weight: 900; margin-top: 4px; }
+.c-green { color: var(--green); }
+.c-gold { color: var(--gold); }
+.c-blue { color: var(--blue); }
+.c-purple { color: var(--purple); }
+
+/* SECTIONS */
+.section-title {
+  font-size: 16px; font-weight: 800; margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 10px var(--green);
+}
+
+/* CARDS */
+.panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; padding: 18px; margin-bottom: 12px;
+}
+input, select {
+  width: 100%; background: #0d1424; border: 1px solid var(--border);
+  color: var(--white); padding: 14px; border-radius: 12px;
+  margin: 6px 0; font-size: 15px; outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,229,138,0.15); }
+button {
+  width: 100%; padding: 14px; border: none; border-radius: 12px;
+  font-weight: 800; font-size: 15px; cursor: pointer;
+  transition: all 0.2s; margin-top: 6px;
+}
+button:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  color: #052e16; box-shadow: 0 4px 20px rgba(34,229,138,0.3);
+}
+.btn-primary:hover { box-shadow: 0 6px 25px rgba(216,173,87,0.42); }
+.btn-secondary { background: var(--card2); color: var(--white); border: 1px solid var(--border); }
+.btn-gold { background: linear-gradient(135deg, #d97706, var(--gold)); color: #451a03; }
+.btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.btn-purple { background: linear-gradient(135deg, #7c3aed, var(--purple)); color: white; box-shadow: 0 4px 20px rgba(168,85,247,0.3); }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+/* GAME TIMER */
+.timer-display {
+  text-align: center; padding: 20px 0;
+}
+.timer-time {
+  font-size: 56px; font-weight: 900; font-family: 'Courier New', monospace;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--purple), var(--blue), var(--green));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.timer-label { font-size: 13px; color: var(--muted); margin-top: 6px; font-weight: 600; }
+.timer-warning {
+  margin-top: 12px; padding: 10px; border-radius: 10px;
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);
+  color: var(--gold); font-size: 13px; font-weight: 700; display: none;
+}
+.timer-warning.show { display: block; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* JOB LIST */
+.job-list { display: grid; gap: 8px; margin-top: 10px; }
+.job-item {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #0d1424; border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+}
+.job-item-name { font-weight: 700; font-size: 14px; }
+.job-item-val { font-size: 12px; color: var(--green); font-weight: 700; }
+.job-del {
+  width: auto; padding: 6px 10px; margin: 0; font-size: 11px;
+  background: transparent; color: var(--red); border: 1px solid rgba(239,68,68,0.3);
+}
+
+/* ROUTINE */
+.routine { display: grid; gap: 6px; margin-top: 10px; }
+.routine-item {
+  display: grid; grid-template-columns: 75px 1fr auto; gap: 10px;
+  align-items: center; background: #0d1424; border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; font-size: 13px;
+}
+.routine-time { color: var(--muted); font-weight: 700; font-size: 12px; }
+.routine-name { font-weight: 700; }
+.routine-pay { color: var(--green); font-size: 11px; font-weight: 700; }
+
+/* HISTORY */
+.history-list { display: grid; gap: 8px; margin-top: 10px; }
+.history-item {
+  background: #0d1424; border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.history-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.history-name { font-weight: 700; font-size: 14px; }
+.history-amount { font-weight: 900; color: var(--green); }
+.history-meta { font-size: 11px; color: var(--muted); }
+.empty { text-align: center; color: var(--muted); padding: 30px; font-size: 14px; }
+
+/* TABS */
+.tab-page { display: none; }
+.tab-page.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: rgba(10,15,26,0.95); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border); padding: 8px 6px;
+}
+.nav-inner { max-width: 760px; margin: 0 auto; display: flex; gap: 3px; overflow-x: auto; }
+.nav-btn {
+  flex: 1; min-width: 62px; background: transparent; border: none;
+  color: var(--muted); padding: 8px 4px; border-radius: 12px;
+  font-size: 9px; font-weight: 800; margin: 0; width: auto;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.nav-btn .ico { font-size: 18px; }
+.nav-btn.active { background: rgba(34,229,138,0.12); color: var(--green); }
+
+/* METAL ROUTE CALCULATOR */
+.metals-banner { background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(34,229,138,.09), var(--card)); }
+.metals-banner .sales-banner-icon { filter: drop-shadow(0 0 16px rgba(251,191,36,.45)); }
+.metal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.metal-field label { display: block; color: var(--muted); font-size: 11px; font-weight: 800; margin: 8px 0 2px; }
+.metal-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-top: 14px; }
+.metal-result { background: linear-gradient(145deg, #1d2a35, var(--card)); border: 1px solid #4a4936; border-radius: 16px; padding: 16px; }
+.metal-result-label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+.metal-result-value { color: var(--gold); font-size: 25px; font-weight: 900; margin: 7px 0 3px; }
+.metal-result-note { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.metal-explanation { margin-top: 12px; padding: 12px; border-radius: 12px; background: rgba(251,191,36,.08); color: #e8d8a5; font-size: 12px; line-height: 1.5; }
+@media (max-width: 480px) { .metal-form-grid { grid-template-columns: 1fr; } }
+
+/* SALES TABS */
+.sales-banner {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  border: 1px solid var(--border); border-radius: 20px; padding: 20px;
+  margin-bottom: 14px; overflow: hidden; position: relative;
+}
+.weapons-banner { background: linear-gradient(135deg, rgba(168,85,247,.2), rgba(59,130,246,.12), var(--card)); }
+.sales-banner-copy { position: relative; z-index: 1; }
+.sales-eyebrow { color: var(--green); font-size: 11px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
+.sales-banner h3 { font-size: 20px; margin: 5px 0 6px; }
+.sales-banner p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.sales-banner-icon { font-size: 42px; filter: drop-shadow(0 0 16px rgba(168,85,247,.45)); }
+.sales-pill { display: inline-block; margin-top: 10px; padding: 6px 10px; border-radius: 99px;
+  background: rgba(34,229,138,.12); color: var(--green); font-size: 11px; font-weight: 800; }
+.sales-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; }
+.sale-card { background: linear-gradient(155deg, var(--card2), var(--card)); border: 1px solid var(--border);
+  border-radius: 18px; padding: 16px; position: relative; overflow: hidden; }
+.sale-card::after { content: ''; position: absolute; width: 120px; height: 120px; right: -55px; top: -55px;
+  border-radius: 50%; background: rgba(168,85,247,.1); pointer-events: none; }
+.sale-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; position: relative; z-index: 1; }
+.sale-icon { font-size: 28px; }
+.sale-tag { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; }
+.sale-name { font-size: 19px; font-weight: 900; margin-top: 3px; }
+.sale-price { color: var(--green); font-size: 25px; font-weight: 900; margin: 15px 0 2px; }
+.sale-unit { color: var(--muted); font-size: 12px; }
+.sale-tier-list { display:grid; gap:5px; margin-top:10px; padding:10px; background:#0d1424; border:1px solid var(--border); border-radius:11px; }
+.sale-tier-row { display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:10px; line-height:1.4; }
+.sale-tier-row strong { color:var(--white); white-space:nowrap; }
+.sale-controls { display: grid; grid-template-columns: 86px 1fr; gap: 8px; align-items: end; margin-top: 12px; }
+.sale-controls label { display: block; color: var(--muted); font-size: 10px; font-weight: 800; margin: 0 0 2px 2px; }
+.sale-qty { text-align: center; margin: 0; padding: 12px 6px; }
+.sale-total { color: var(--muted); font-size: 11px; margin-top: 9px; }
+.sale-total strong { color: var(--white); }
+.quote-panel { margin: 0 0 14px; padding: 16px; border:1px solid #634538; border-radius:18px; background:linear-gradient(145deg,#271719,#150e10); }
+.quote-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.quote-heading h4 { font-size:17px; margin:0 0 4px; color:var(--white); }
+.quote-heading p { color:var(--muted); font-size:12px; line-height:1.4; }
+.quote-total-label { display:block; color:var(--muted); font-size:9px; font-weight:800; text-align:right; text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }.quote-grand-total { color:var(--gold); font-size:20px; font-weight:900; white-space:nowrap; text-align:right; }
+.quote-org-label { display:block; color:var(--muted); font-size:11px; font-weight:800; margin:10px 0 4px; }
+.quote-org { max-width:240px; margin:0 0 12px; padding:10px; }
+.quote-items { display:grid; gap:7px; }
+.quote-row { display:grid; grid-template-columns:minmax(115px,1.2fr) minmax(130px,1.3fr) minmax(100px,.9fr) minmax(100px,.9fr) minmax(110px,1fr); gap:8px; align-items:center; padding:9px 10px; border-radius:11px; background:#100b0c; border:1px solid #4a282d; }
+.quote-item-name { font-weight:800; font-size:13px; }
+.quote-category { display:block; color:var(--gold); font-size:9px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; margin-bottom:2px; }
+.quote-item-price { display:block; color:var(--muted); font-size:10px; line-height:1.35; }
+.quote-field label { display:block; color:var(--muted); font-size:9px; font-weight:800; margin-bottom:3px; }
+.quote-qty,.quote-price-input { text-align:center; margin:0; padding:9px 5px; }
+.quote-fixed-price { color:var(--white); font-size:11px; font-weight:700; }
+.quote-line-total { color:var(--white); font-size:12px; font-weight:800; text-align:right; }
+.quote-actions { display:flex; gap:8px; margin-top:12px; }
+.quote-actions button { margin:0; }
+.quote-hint { color:var(--muted); font-size:10px; line-height:1.45; margin-top:8px; }
+@media (max-width:620px) { .quote-row { grid-template-columns:1fr 1fr; gap:7px; padding:9px; }.quote-row > :first-child { grid-column:span 2; }.quote-line-total { grid-column:span 2; text-align:right; padding-top:4px; }.quote-grand-total { font-size:17px; } }
+@media (max-width:420px) { .quote-actions { flex-direction:column; }.quote-org { max-width:none; } }
+.catalog-empty { background: linear-gradient(145deg, var(--card), #12251f); border: 1px dashed #345648;
+  border-radius: 18px; padding: 26px 20px; text-align: center; }
+.catalog-empty-icon { font-size: 34px; margin-bottom: 8px; }
+.catalog-empty h3 { font-size: 16px; margin-bottom: 7px; }
+.catalog-empty p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; z-index: 100;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  color: #052e16; padding: 12px 22px; border-radius: 14px;
+  font-weight: 800; font-size: 14px; opacity: 0; pointer-events: none;
+  transition: all 0.3s; box-shadow: 0 10px 40px rgba(34,229,138,0.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.warn { background: linear-gradient(135deg, #d97706, var(--gold)); color: #451a03; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 24px; width: 100%; max-width: 400px;
+}
+.modal h3 { margin-bottom: 16px; font-size: 18px; }
+.balance-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.balance-modal-heading { display:flex; align-items:center; gap:12px; }
+.balance-modal-icon { width:46px; height:46px; display:grid; place-items:center; border-radius:14px;
+  background:rgba(34,229,138,.12); color:var(--green); font-size:23px; }
+.balance-modal h3 { margin:0; }
+.balance-modal-subtitle { color:var(--muted); font-size:12px; margin-top:4px; }
+.balance-close { width:36px; padding:6px; margin:0; border-radius:10px; background:var(--card2); color:var(--muted); font-size:20px; }
+.balance-current { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; margin:12px 0 14px;
+  background:#0d1424; border:1px solid var(--border); border-radius:14px; }
+.balance-current span { color:var(--muted); font-size:12px; font-weight:700; }
+.balance-current strong { color:var(--green); font-size:19px; }
+.balance-input-label { display:block; color:var(--white); font-size:13px; font-weight:800; margin:8px 0 4px; }
+.balance-modal .btn-row { margin-top:14px; }
+.balance-modal .btn-row button { margin-top:0; }
+
+/* Noir Mafia redesign */
+:root { --bg:#0b090a; --card:#171012; --card2:#211417; --border:#4a282d; --green:#d8ad57; --green-dark:#9c6c24; --purple:#bd5b68; --blue:#d8ad57; --gold:#e6bd67; --red:#df5f68; --white:#f6eee4; --muted:#b49b91; }
+body { background-color:var(--bg); background-image: radial-gradient(circle at 15% 0%,rgba(122,31,45,.24),transparent 38%),radial-gradient(circle at 90% 20%,rgba(218,169,80,.10),transparent 34%),repeating-linear-gradient(135deg,rgba(255,255,255,.018) 0,rgba(255,255,255,.018) 1px,transparent 1px,transparent 5px); }
+.logo { background:linear-gradient(90deg,#e6bd67,#a73e50); -webkit-background-clip:text; background-clip:text; }
+.hero { background:linear-gradient(145deg,#1c1114,#100b0c); border-color:#63353a; box-shadow:0 20px 60px rgba(0,0,0,.62); }
+.hero::before { background:radial-gradient(circle,rgba(177,58,72,.21),transparent 70%); }
+.hero-total { background:linear-gradient(90deg,#e6bd67,#bd5b68); -webkit-background-clip:text; background-clip:text; }
+.progress-fill { background:linear-gradient(90deg,#89333f,#d8ad57,#ead08e); box-shadow:0 0 20px rgba(216,173,87,.4); }
+.panel,.stat-card,.sale-card { background:linear-gradient(155deg,#211417,#150e10); border-color:#4a282d; }
+input,select { background:#100b0c; border-color:#4a282d; } input:focus,select:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(216,173,87,.15); }
+.btn-primary { background:linear-gradient(135deg,#8e3543,#d8ad57); color:#21100d; box-shadow:0 4px 20px rgba(177,58,72,.25); }
+.btn-secondary { background:#211417; border-color:#4a282d; }.btn-gold { background:linear-gradient(135deg,#9c6c24,#e6bd67); color:#26160c; }.btn-purple { background:linear-gradient(135deg,#722c3a,#bd5b68); }
+.bottom-nav { background:rgba(11,9,10,.96); border-color:#4a282d; }.nav-btn.active { background:rgba(177,58,72,.2); color:#e6bd67; }
+.mafia-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:10px 0 14px; padding:5px; background:#100b0c; border:1px solid #4a282d; border-radius:15px; }.mafia-tab { margin:0; padding:10px 5px; background:transparent; color:var(--muted); border:1px solid transparent; font-size:11px; }.mafia-tab.active { background:linear-gradient(135deg,#54202b,#8e3543); color:#f6eee4; border-color:#a45854; }.mafia-panel { display:none; }.mafia-panel.active { display:block; animation:fadeIn .25s ease; }
+.weapons-banner { background:linear-gradient(135deg,rgba(122,31,45,.35),rgba(216,173,87,.10),var(--card)); }.metals-banner { background:linear-gradient(135deg,rgba(216,173,87,.18),rgba(122,31,45,.23),var(--card)); }.sale-price,.routine-pay,.history-amount { color:#e6bd67; }.metal-result { background:linear-gradient(145deg,#2a1b1b,var(--card)); border-color:#634538; }.metal-explanation { background:rgba(216,173,87,.09); color:#ead5a6; }
+
+
+/* GERENCIADOR DE ANÚNCIOS /DW */
+.dw-panel { margin:0 0 14px; padding:16px; border:1px solid #634538; border-radius:18px; background:linear-gradient(145deg,#271719,#150e10); }
+.dw-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.dw-field label { display:block; color:var(--muted); font-size:11px; font-weight:800; margin:8px 0 4px; }
+.dw-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0 10px; }
+.dw-actions button { margin:0; padding:9px; font-size:11px; }
+.dw-weapons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin:8px 0 12px; }
+.dw-weapon-option { display:flex; align-items:center; gap:9px; padding:10px 11px; margin:0; border:1px solid var(--border); border-radius:11px; background:#100b0c; color:var(--white); font-size:12px; font-weight:700; cursor:pointer; }
+.dw-weapon-option input { width:17px; height:17px; margin:0; accent-color:var(--gold); }
+.dw-output { width:100%; min-height:82px; resize:vertical; background:#0d0a0b; color:#f6eee4; border:1px solid #735336; border-radius:12px; padding:12px; font:600 13px/1.5 'Courier New',monospace; }
+.dw-status { min-height:18px; margin-top:7px; color:var(--gold); font-size:11px; }
+.dw-hint { color:var(--muted); font-size:10px; line-height:1.45; margin-top:8px; }
+#dw-copy:disabled { opacity:.5; cursor:not-allowed; box-shadow:none; }
+.metal-result-note { line-height:1.45; }
+@media(max-width:480px){.mafia-tab{padding:9px 3px;font-size:9px}.dw-form-grid,.dw-weapons{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">BRP SYSTEM</div>
+    <div class="clock" id="clock">--:--</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label" id="hero-label">Bem-vindo</div>
+    <div class="hero-title" id="hero-title">Defina sua Meta</div>
+    <div class="hero-total" id="hero-total">R$ 0</div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-info">
+      <span id="progress-pct">0%</span>
+      <span id="meta-info">Defina abaixo</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Banco</div>
+      <div class="stat-value c-green" id="stat-bank">R$ 0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Na Mão</div>
+      <div class="stat-value c-gold" id="stat-cash">R$ 0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Falta</div>
+      <div class="stat-value c-blue" id="stat-missing">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ganho</div>
+      <div class="stat-value c-purple" id="stat-earned">R$ 0</div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: INICIO ============ -->
+  <div id="page-home" class="tab-page active">
+    <div class="section-title"><span class="dot"></span>Definir Meta</div>
+    <div class="panel">
+      <input type="number" id="meta-input" min="0" step="0.01" placeholder="Valor da sua meta em reais">
+      <button class="btn-primary" onclick="saveMeta()">Salvar Meta</button>
+    </div>
+
+    <div class="section-title"><span class="dot"></span>Registro Rapido</div>
+    <div class="panel">
+      <select id="quick-job"></select>
+      <input type="number" id="quick-amount" min="0.01" step="0.01" placeholder="Valor recebido em reais">
+      <input type="text" id="quick-note" placeholder="Observacao (opcional)">
+      <button class="btn-primary" onclick="quickRegister()">Registrar Ganho</button>
+    </div>
+
+    <div class="section-title"><span class="dot"></span>Dinheiro</div>
+    <div class="panel">
+      <input type="number" id="deposit-input" min="0.01" step="0.01" placeholder="Valor para depositar em reais">
+      <button class="btn-secondary" onclick="doDeposit()">Mao -> Banco</button>
+      <hr>
+      <div class="btn-row">
+        <button class="btn-gold" onclick="adjustCash()">Ajustar Mao</button>
+        <button class="btn-secondary" onclick="adjustBank()">Ajustar Banco</button>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="dot"></span>Rotina Sugerida</div>
+    <div class="panel">
+      <div class="routine" id="routine-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: EMPREGOS ============ -->
+  <div id="page-jobs" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Seus Empregos</div>
+    <div class="panel">
+      <div class="job-list" id="job-list"></div>
+    </div>
+    <div class="section-title"><span class="dot"></span>Adicionar Novo Emprego</div>
+    <div class="panel">
+      <input type="text" id="new-job-name" placeholder="Nome do emprego (ex: Pedreiro)">
+      <input type="text" id="new-job-value" placeholder="Valor (ex: R$ 150/dia ou Variavel)">
+      <button class="btn-purple" onclick="addJob()">Adicionar Emprego</button>
+      <div class="hint">Dica: empregos adicionados aparecem no registro rapido automaticamente.</div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: CRONOMETRO ============ -->
+  <div id="page-timer" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Cronometro de Jogo</div>
+    <div class="panel">
+      <div class="timer-display">
+        <div class="timer-time" id="timer-display">00:00:00</div>
+        <div class="timer-label" id="timer-status">Pronto para iniciar</div>
+        <div class="timer-warning" id="timer-warning">
+          ATENCAO: Voce ja jogou 1 HORA! Va trabalhar!
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" id="timer-start-btn" onclick="startTimer()">Iniciar</button>
+        <button class="btn-secondary" onclick="pauseTimer()">Pausar</button>
+      </div>
+      <button class="btn-danger" onclick="resetTimer()">Zerar Cronometro</button>
+      <div class="hint">
+        Como funciona: clique em INICIAR quando comecar a jogar. O cronometro conta o tempo.
+        Quando completar 1 HORA, o sistema avisa com som e mensagem!
+      </div>
+      <hr>
+      <div class="section-title" style="margin-top:0"><span class="dot"></span>Sessoes de Hoje</div>
+      <div class="history-list" id="sessions-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: REGISTRO ============ -->
+  <div id="page-register" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Registrar por Emprego</div>
+    <div class="panel">
+      <select id="reg-job-select"></select>
+      <input type="number" id="reg-amount" min="0.01" step="0.01" placeholder="Valor recebido em reais">
+      <input type="text" id="reg-note" placeholder="Observacao (opcional)">
+      <button class="btn-primary" onclick="registerByJob()">Registrar</button>
+    </div>
+    <div class="section-title"><span class="dot"></span>Astronauta (R$ 6.900/h → Banco)</div>
+    <div class="panel">
+      <input type="number" step="0.1" id="astro-hours" placeholder="Horas trabalhadas">
+      <button class="btn-primary" onclick="registerAstro()">Calcular e Registrar → Banco</button>
+    </div>
+    <div class="section-title"><span class="dot"></span>Mecânico — pagamento no Banco</div>
+    <div class="panel">
+      <div class="btn-row">
+        <button class="btn-primary" onclick="fixedRegister('Mecânico Blindado', 2000, 'bank')">+R$ 2.000 Blindado → Banco</button>
+        <button class="btn-secondary" onclick="fixedRegister('Mecânico Normal', 1000, 'bank')">+R$ 1.000 Normal → Banco</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: MAFIA ============ -->
+  <div id="page-mafia" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Central da Máfia</div>
+    <div class="mafia-tabs" role="tablist" aria-label="Área da Máfia">
+      <button type="button" class="mafia-tab active" data-mafia-tab="weapons">🔫 Vendas de armas</button>
+      <button type="button" class="mafia-tab" data-mafia-tab="metals">🪙 Metais e rotas</button>
+      <button type="button" class="mafia-tab" data-mafia-tab="announce">📣 Gerenciador de anúncios</button>
+    </div>
+    <div id="mafia-panel-weapons" class="mafia-panel active">
+      <div class="sales-banner weapons-banner">
+        <div class="sales-banner-copy">
+          <div class="sales-eyebrow">Tabela de valores • BRP</div>
+          <h3>Tabela de vendas</h3>
+          <p>Monte o pedido do cliente e veja o valor total com os preços escolhidos.</p>
+          <span class="sales-pill">Armas, drogas, dinheiro sujo, metais e Lockpicks</span>
+        </div>
+        <div class="sales-banner-icon">💰</div>
+      </div>
+      <div class="quote-panel">
+        <div class="quote-heading">
+          <div><h4>Pedido do cliente</h4><p>Informe as quantidades; nas faixas, ajuste o preço por unidade dentro dos limites da tabela.</p></div>
+          <div><small class="quote-total-label">Total calculado</small><div class="quote-grand-total" id="quote-grand-total">R$ 0</div></div>
+        </div>
+        <label class="quote-org-label" for="quote-org">Organização</label>
+        <select id="quote-org" class="quote-org"><option value="Máfia">Máfia</option><option value="Terrorista">Terrorista</option></select>
+        <div class="quote-items" id="quote-items"></div>
+        <div class="quote-hint">Faixas de armas conforme a tabela enviada. Ervas, coca e pedra têm preço máximo informado. Dinheiro sujo paga 50% do valor; metais pagam R$ 3,75 cada.</div>
+        <div class="quote-actions">
+          <button class="btn-secondary" type="button" onclick="resetSalesQuote()">Limpar pedido</button>
+          <button class="btn-primary" type="button" onclick="registerSalesQuote()">Registrar venda completa</button>
+        </div>
+      </div>
+    </div>
+    <div id="mafia-panel-announce" class="mafia-panel">
+      <div class="sales-banner weapons-banner">
+        <div class="sales-banner-copy">
+          <div class="sales-eyebrow">Anúncios no chat • BRP</div>
+          <h3>Gerenciador de anúncios</h3>
+          <p>Escolha vendas ou carregamento, selecione as armas e copie o comando pronto para colar no jogo.</p>
+          <span class="sales-pill">Usa o formato /dw e //</span>
+        </div>
+        <div class="sales-banner-icon">📣</div>
+      </div>
+      <div class="dw-panel">
+        <div class="dw-form-grid">
+          <div class="dw-field"><label for="dw-type">Tipo de anúncio</label><select id="dw-type" onchange="updateDwAnnouncement()"><option value="vendas">Vendas</option><option value="carregamento">Carregamento</option></select></div>
+          <div class="dw-field"><label for="dw-state">Status</label><select id="dw-state" onchange="updateDwAnnouncement()"><option value="on">on</option><option value="off">off</option></select></div>
+        </div>
+        <div class="dw-field"><label>Selecione as armas</label></div>
+        <div class="dw-actions"><button class="btn-secondary" type="button" onclick="setAllDwWeapons(true)">Marcar todas</button><button class="btn-secondary" type="button" onclick="setAllDwWeapons(false)">Limpar seleção</button></div>
+        <div class="dw-weapons" id="dw-weapons"></div>
+        <div class="dw-field"><label for="dw-message">Texto depois de //</label><input id="dw-message" type="text" value="carregamentos disponíveis façam seus pedidos" oninput="updateDwAnnouncement()"></div>
+        <div class="dw-field"><label for="dw-output">Comando pronto</label><textarea id="dw-output" class="dw-output" rows="3" readonly placeholder="Marque uma ou mais armas para montar o anúncio."></textarea></div>
+        <button class="btn-primary" id="dw-copy" type="button" onclick="copyDwAnnouncement()" disabled>Copiar para colar no jogo</button>
+        <div class="dw-status" id="dw-status" aria-live="polite"></div>
+        <div class="dw-hint">O gerenciador apenas monta e copia o anúncio; não envia automaticamente no jogo.</div>
+      </div>
+    </div>
+    <div id="mafia-panel-metals" class="mafia-panel">
+      <div class="sales-banner metals-banner">
+        <div class="sales-banner-copy">
+          <div class="sales-eyebrow">Operação • BRP • Família</div>
+          <h3>Planejador de dinheiro sujo e metais</h3>
+          <p>Informe quantos metais quer alcançar. O painel estima as rotas necessárias e o dinheiro sujo para completar a troca.</p>
+          <span class="sales-pill">VIP Ouro: 800 metais por rota • R$ 2.000 sujo = 800 metais</span>
+        </div>
+        <div class="sales-banner-icon">🪙</div>
+      </div>
+      <div class="panel">
+        <div class="metal-form-grid">
+          <div class="metal-field">
+            <label for="metal-vip">VIP da org</label>
+            <select id="metal-vip" onchange="updateMetalVip()">
+              <option value="gold">VIP Ouro — 800 metais por rota</option>
+              <option value="custom">Outro VIP — informar pagamento</option>
+            </select>
+          </div>
+          <div class="metal-field" id="metal-custom-row" style="display:none">
+            <label for="metal-custom-pay">Metais recebidos por rota</label>
+            <input type="number" id="metal-custom-pay" min="1" step="1" placeholder="Ex.: 1200" oninput="calculateMetalRoutes()">
+          </div>
+          <div class="metal-field">
+            <label for="metal-target">Meta total desejada de metais</label>
+            <input type="number" id="metal-target" min="0" step="1" placeholder="Ex.: 10000" oninput="calculateMetalRoutes()">
+          </div>
+          <div class="metal-field">
+            <label>Regra da troca</label>
+            <div class="quote-fixed-price">R$ 2.000 sujo → 800 metais</div>
+          </div>
+        </div>
+        <button class="btn-gold" type="button" onclick="calculateMetalRoutes()">Calcular rotas e dinheiro sujo</button>
+        <div class="metal-results">
+          <div class="metal-result"><div class="metal-result-label">Rotas necessárias</div><div class="metal-result-value" id="metal-needed">—</div><div class="metal-result-note" id="metal-needed-note">Informe sua meta de metais.</div></div>
+          <div class="metal-result"><div class="metal-result-label">Dinheiro sujo necessário</div><div class="metal-result-value" id="metal-dirty-needed">—</div><div class="metal-result-note" id="metal-dirty-note">R$ 2.000 por troca completa de 800 metais.</div></div>
+          <div class="metal-result"><div class="metal-result-label">Metais pelas rotas</div><div class="metal-result-value" id="metal-route-metals">—</div><div class="metal-result-note" id="metal-route-note">Considera os metais recebidos por rota do VIP.</div></div>
+          <div class="metal-result"><div class="metal-result-label">Metais pela troca</div><div class="metal-result-value" id="metal-exchange-metals">—</div><div class="metal-result-note" id="metal-exchange-note">Trocas arredondadas para completar a meta.</div></div>
+        </div>
+        <div class="metal-explanation"><strong>Como calcular:</strong> as rotas são calculadas pelo pagamento por rota do VIP selecionado. A estimativa da troca usa R$ 2.000 de dinheiro sujo por 800 metais e arredonda para cima para completar a meta. Rotas e troca são estimativas separadas para alcançar o mesmo objetivo; não some os dois resultados se a meta for o total desejado.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: HISTORICO ============ -->
+  <div id="page-history" class="tab-page">
+    <div class="section-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:8px"><span class="dot"></span>Historico</span>
+      <button class="btn-danger" style="width:auto;padding:8px 14px;font-size:12px" onclick="clearHistory()">Limpar</button>
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" data-page="home"><span class="ico">🏠</span>Inicio</button>
+    <button class="nav-btn" data-page="jobs"><span class="ico">💼</span>Empregos</button>
+    <button class="nav-btn" data-page="timer"><span class="ico">🎮</span>Jogo</button>
+    <button class="nav-btn" data-page="register"><span class="ico">➕</span>Registrar</button>
+    <button class="nav-btn" data-page="mafia"><span class="ico">♠️</span>Mafia</button>
+    <button class="nav-btn" data-page="history"><span class="ico">📜</span>Historico</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Registrado!</div>
+
+<div class="modal-overlay" id="balance-modal" role="dialog" aria-modal="true" aria-labelledby="balance-modal-title">
+  <div class="modal balance-modal">
+    <div class="balance-modal-header">
+      <div class="balance-modal-heading">
+        <div class="balance-modal-icon" id="balance-modal-icon">💵</div>
+        <div>
+          <h3 id="balance-modal-title">Ajustar saldo</h3>
+          <div class="balance-modal-subtitle" id="balance-modal-subtitle">Atualize o valor disponível.</div>
+        </div>
+      </div>
+      <button class="balance-close" type="button" aria-label="Fechar" onclick="closeBalanceModal()">×</button>
+    </div>
+    <div class="balance-current"><span>Saldo atual</span><strong id="balance-current-value">R$ 0</strong></div>
+    <label class="balance-input-label" for="balance-input">Novo valor (R$)</label>
+    <input type="number" id="balance-input" min="0" step="0.01" placeholder="Novo saldo em reais">
+    <div class="hint">Este ajuste substitui o saldo atual; não é um depósito.</div>
+    <div class="btn-row">
+      <button class="btn-secondary" type="button" onclick="closeBalanceModal()">Cancelar</button>
+      <button class="btn-primary" type="button" onclick="saveBalanceAdjustment()">Salvar ajuste</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+var STORAGE_KEY = 'brp_system_v3';
+
+// Default jobs
+var DEFAULT_JOBS = [
+  { name: 'Astronauta', value: 'R$ 6.900/h → Banco' },
+  { name: 'SAMU', value: 'Variavel' },
+  { name: 'Mecanico', value: 'R$ 1k / R$ 2k → Banco' },
+  { name: 'Lixeiro', value: 'Variavel' },
+  { name: 'Motorista de Jato', value: 'Variavel' },
+  { name: 'Instalador de Internet', value: 'Variavel' },
+  { name: 'DNIT', value: 'Variavel' },
+  { name: 'Outro', value: 'Variavel' }
+];
+
+var DEFAULT_ROUTINE = [
+  { time: '06-07', name: 'Astronauta', pay: 'R$ 6.900/h → Banco' },
+  { time: '07-09', name: 'SAMU', pay: 'variavel' },
+  { time: '09-10', name: 'Astronauta', pay: 'R$ 6.900/h → Banco' },
+  { time: '10-12', name: 'Mecanico', pay: 'R$ 1k / 2k → Banco' },
+  { time: '12-13', name: 'Astronauta', pay: 'R$ 6.900/h → Banco' },
+  { time: '13-15', name: 'Lixeiro', pay: 'variavel' },
+  { time: '15-16', name: 'Instalador Net', pay: 'variavel' },
+  { time: '16-18', name: 'SAMU', pay: 'variavel' },
+  { time: '18-19', name: 'Astronauta', pay: 'R$ 6.900/h → Banco' },
+  { time: '19-21', name: 'DNIT', pay: 'variavel' },
+  { time: '21-22', name: 'Mecanico', pay: 'R$ 2k blindado → Banco' }
+];
+
+var WEAPON_PRODUCTS = [
+  { name: 'Desert', price: 18000, type: 'Pistola', icon: '🔫' },
+  { name: 'M4', price: 25000, type: 'Rifle', icon: '🎯' },
+  { name: 'Shotgun', price: 25000, type: 'Escopeta', icon: '💥' },
+  { name: 'Lockpicks', type: 'Ferramenta', icon: '🗝️', priceTiers: [
+    { min: 1, max: 4, price: 45000, label: '1 a 4 unidades' },
+    { min: 5, max: 9, price: 40000, label: '5 a 9 unidades' },
+    { min: 10, max: null, price: 38500, label: '10+ unidades • negociável para volumes maiores' }
+  ] }
+];
+
+var state = {
+  bank: 0, cash: 0, meta: null, earned: 0,
+  history: [], jobs: JSON.parse(JSON.stringify(DEFAULT_JOBS)),
+  timerSeconds: 0, timerRunning: false, timerStartedAt: null, timerInterval: null,
+  sessions: [], hourAlerted: false, timerMode: 2
+};
+
+try {
+  var saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    var parsed = JSON.parse(saved);
+    for (var k in parsed) { if (parsed.hasOwnProperty(k)) state[k] = parsed[k]; }
+  }
+} catch(e) {}
+['routesCompleted','routeIntervalMinutes','routeNextAt','routeInProgress','routePlanUnits','routePlanBaseUnits','routePlanPay','routePurchasedMetals','routeMetalsOwned'].forEach(function(key) { delete state[key]; });
+
+if (!Array.isArray(state.jobs) || state.jobs.length === 0) state.jobs = JSON.parse(JSON.stringify(DEFAULT_JOBS));
+if (!Array.isArray(state.history)) state.history = [];
+if (!Array.isArray(state.sessions)) state.sessions = [];
+state.bank = Number(state.bank) || 0;
+state.cash = Number(state.cash) || 0;
+state.earned = Number(state.earned) || 0;
+if (state.meta !== null && state.meta !== undefined) state.meta = Number(state.meta) || null;
+state.timerSeconds = Math.max(0, Number(state.timerSeconds) || 0);
+if (typeof state.timerStartedAt !== 'number' || !isFinite(state.timerStartedAt)) state.timerStartedAt = null;
+if (state.timerMode !== 2) {
+  state.timerMode = 2;
+  if (state.timerRunning) state.timerStartedAt = Date.now();
+}
+if (typeof state.hourAlerted === 'undefined') state.hourAlerted = false;
+
+
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>\"']/g, function(ch) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch];
+  });
+}
+
+function money(v) {
+  return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function save() {
+  try {
+    var toSave = {};
+    for (var k in state) {
+      if (k !== 'timerInterval') toSave[k] = state[k];
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  } catch(e) {}
+  render();
+}
+
+function toast(msg, isWarn) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isWarn ? ' warn' : '');
+  setTimeout(function() { el.className = 'toast'; }, 2500);
+}
+
+function total() { return Number(state.bank) + Number(state.cash); }
+
+function destinationForJob(job) {
+  var name = String(job || '').toLowerCase();
+  return (name.indexOf('astronaut') >= 0 || name.indexOf('mec') >= 0) ? 'bank' : 'cash';
+}
+
+function addRecord(job, amount, note, destination) {
+  amount = Number(amount);
+  if (!amount || amount <= 0) { toast('Valor invalido!'); return false; }
+  if (!note) note = '';
+  if (destination === 'bank') state.bank += amount;
+  else state.cash += amount;
+  state.earned += amount;
+  state.history.unshift({
+    job: job, amount: amount, note: note,
+    destination: destination === 'bank' ? 'Banco' : 'Mão',
+    date: new Date().toLocaleString('pt-BR')
+  });
+  save();
+  toast('+ ' + money(amount) + ' registrado!');
+  return true;
+}
+
+// ===== META =====
+function saveMeta() {
+  var v = Number(document.getElementById('meta-input').value);
+  if (!v || v <= 0) { toast('Digite um valor valido!'); return; }
+  state.meta = v;
+  document.getElementById('meta-input').value = '';
+  save();
+  toast('Meta definida: ' + money(v));
+}
+
+// ===== REGISTRO RAPIDO =====
+function quickRegister() {
+  var job = document.getElementById('quick-job').value;
+  var amount = document.getElementById('quick-amount').value;
+  var note = document.getElementById('quick-note').value;
+  if (addRecord(job, amount, note, destinationForJob(job))) {
+    document.getElementById('quick-amount').value = '';
+    document.getElementById('quick-note').value = '';
+  }
+}
+
+// ===== REGISTRO POR EMPREGO =====
+function registerByJob() {
+  var job = document.getElementById('reg-job-select').value;
+  var amount = document.getElementById('reg-amount').value;
+  var note = document.getElementById('reg-note').value;
+  if (addRecord(job, amount, note, destinationForJob(job))) {
+    document.getElementById('reg-amount').value = '';
+    document.getElementById('reg-note').value = '';
+  }
+}
+
+// ===== REGISTRO FIXO =====
+function fixedRegister(name, val, destination) { addRecord(name, val, destination === 'bank' ? 'Pagamento direcionado ao Banco' : '', destination || destinationForJob(name)); }
+
+// ===== ASTRONAUTA =====
+function registerAstro() {
+  var h = Number(document.getElementById('astro-hours').value);
+  if (!h || h <= 0) { toast('Digite as horas!'); return; }
+  var val = h * 6900;
+  if (addRecord('Astronauta', val, h + ' hora(s) → Banco', 'bank')) {
+    document.getElementById('astro-hours').value = '';
+  }
+}
+
+// ===== DEPOSITO =====
+function doDeposit() {
+  var v = Number(document.getElementById('deposit-input').value);
+  if (!v || v <= 0) { toast('Valor invalido!'); return; }
+  if (v > state.cash) { toast('Sem dinheiro suficiente!'); return; }
+  state.cash -= v; state.bank += v;
+  state.history.unshift({ job: 'Deposito', amount: v, note: 'Mao -> Banco', destination: 'Banco', date: new Date().toLocaleString('pt-BR') });
+  document.getElementById('deposit-input').value = '';
+  save(); toast('Depositado: ' + money(v));
+}
+
+var balanceEditTarget = null;
+
+function openBalanceModal(target) {
+  balanceEditTarget = target;
+  var isCash = target === 'cash';
+  document.getElementById('balance-modal-title').textContent = isCash ? 'Ajustar dinheiro na mão' : 'Ajustar saldo do banco';
+  document.getElementById('balance-modal-subtitle').textContent = isCash ? 'Atualize o valor que está com você.' : 'Atualize o saldo disponível no banco.';
+  document.getElementById('balance-modal-icon').textContent = isCash ? '💵' : '🏦';
+  document.getElementById('balance-current-value').textContent = money(isCash ? state.cash : state.bank);
+  document.getElementById('balance-input').value = isCash ? state.cash : state.bank;
+  document.getElementById('balance-modal').classList.add('show');
+}
+
+function closeBalanceModal() {
+  document.getElementById('balance-modal').classList.remove('show');
+  balanceEditTarget = null;
+}
+
+function saveBalanceAdjustment() {
+  var input = document.getElementById('balance-input');
+  var value = Number(input.value);
+  if (input.value === '' || !isFinite(value) || value < 0) { toast('Digite um saldo valido!'); return; }
+  if (balanceEditTarget === 'cash') {
+    state.cash = value;
+  } else if (balanceEditTarget === 'bank') {
+    state.bank = value;
+  } else {
+    closeBalanceModal();
+    return;
+  }
+  var target = balanceEditTarget;
+  closeBalanceModal();
+  save();
+  toast(target === 'cash' ? 'Dinheiro na mao atualizado!' : 'Saldo do banco atualizado!');
+}
+
+function adjustCash() { openBalanceModal('cash'); }
+function adjustBank() { openBalanceModal('bank'); }
+
+// ===== EMPREGOS =====
+function addJob() {
+  var name = document.getElementById('new-job-name').value.trim();
+  var val = document.getElementById('new-job-value').value.trim() || 'Variavel';
+  if (!name) { toast('Digite o nome do emprego!'); return; }
+  state.jobs.push({ name: name, value: val });
+  document.getElementById('new-job-name').value = '';
+  document.getElementById('new-job-value').value = '';
+  save();
+  toast('Emprego "' + name + '" adicionado!');
+}
+
+function removeJob(idx) {
+  if (confirm('Remover o emprego "' + state.jobs[idx].name + '"?')) {
+    state.jobs.splice(idx, 1);
+    save();
+    toast('Emprego removido');
+  }
+}
+
+// ===== CRONOMETRO =====
+function currentTimerSeconds() {
+  var base = Math.max(0, Number(state.timerSeconds) || 0);
+  var start = Number(state.timerStartedAt);
+  if (state.timerRunning && start > 0) base += Math.max(0, Math.floor((Date.now() - start) / 1000));
+  return Math.floor(base);
+}
+
+function formatTime(sec) {
+  sec = Math.max(0, Math.floor(Number(sec) || 0));
+  var h = Math.floor(sec / 3600);
+  var m = Math.floor((sec % 3600) / 60);
+  var s = sec % 60;
+  return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function updateTimerDisplay() {
+  var elapsed = currentTimerSeconds();
+  document.getElementById('timer-display').textContent = formatTime(elapsed);
+  var warn = document.getElementById('timer-warning');
+  var startBtn = document.getElementById('timer-start-btn');
+  if (startBtn) startBtn.textContent = state.timerRunning ? 'Em andamento...' : (elapsed > 0 ? 'Continuar' : 'Iniciar');
+  if (elapsed >= 3600) {
+    warn.classList.add('show');
+    document.getElementById('timer-status').textContent = 'PASSOU DE 1 HORA!';
+    if (!state.hourAlerted) {
+      state.hourAlerted = true;
+      toast('ATENCAO: 1 HORA DE JOGO!', true);
+      try { playAlarm(); } catch(e) {}
+      save();
+    }
+  } else if (elapsed >= 1800) {
+    warn.classList.remove('show');
+    document.getElementById('timer-status').textContent = 'Ja se foram 30 minutos...';
+  } else if (state.timerRunning) {
+    warn.classList.remove('show');
+    document.getElementById('timer-status').textContent = 'Jogo em andamento...';
+  } else if (elapsed > 0) {
+    warn.classList.remove('show');
+    document.getElementById('timer-status').textContent = 'Pausado';
+  } else {
+    warn.classList.remove('show');
+    document.getElementById('timer-status').textContent = 'Pronto para iniciar';
+  }
+}
+
+var alarmAudioContext = null;
+function prepareAlarmAudio() {
+  try {
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtx && !alarmAudioContext) alarmAudioContext = new AudioCtx();
+    if (alarmAudioContext && alarmAudioContext.state === 'suspended') alarmAudioContext.resume();
+  } catch(e) {}
+}
+function playAlarm() {
+  try {
+    prepareAlarmAudio();
+    if (!alarmAudioContext) return;
+    var ctx = alarmAudioContext;
+    if (ctx.state === 'suspended') ctx.resume();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    osc.start();
+    setTimeout(function() {
+      osc.frequency.value = 660;
+      setTimeout(function() { try { osc.stop(); } catch(e) {} }, 300);
+    }, 300);
+  } catch(e) {}
+}
+
+function startTimer() {
+  if (state.timerRunning) return;
+  state.timerRunning = true;
+  state.timerStartedAt = Date.now();
+  prepareAlarmAudio();
+  state.timerInterval = setInterval(function() {
+    updateTimerDisplay();
+    var elapsed = currentTimerSeconds();
+    if (elapsed - Number(state.timerSeconds) >= 30) {
+      state.timerSeconds = elapsed;
+      state.timerStartedAt = Date.now();
+      save();
+    }
+  }, 1000);
+  save();
+  toast('Cronometro iniciado!');
+}
+
+function pauseTimer() {
+  if (!state.timerRunning) return;
+  state.timerSeconds = currentTimerSeconds();
+  state.timerRunning = false;
+  state.timerStartedAt = null;
+  clearInterval(state.timerInterval);
+  state.timerInterval = null;
+  save();
+  toast('Cronometro pausado em ' + formatTime(state.timerSeconds));
+}
+
+function resetTimer() {
+  var elapsed = currentTimerSeconds();
+  if (elapsed > 60) {
+    state.sessions.unshift({ duration: elapsed, timestamp: Date.now(), date: new Date().toLocaleString('pt-BR') });
+    if (state.sessions.length > 100) state.sessions.pop();
+  }
+  clearInterval(state.timerInterval);
+  state.timerInterval = null;
+  state.timerRunning = false;
+  state.timerStartedAt = null;
+  state.timerSeconds = 0;
+  state.hourAlerted = false;
+  save();
+  toast('Cronometro zerado');
+}
+
+function parsePtBrDate(value) {
+  var m = String(value || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (!m) return null;
+  var d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), Number(m[4] || 0), Number(m[5] || 0), Number(m[6] || 0));
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// ===== ROTA DE METAIS =====
+function formatMetalQuantity(value) {
+  var amount = Math.floor(Math.max(0, Number(value) || 0));
+  return amount.toLocaleString('pt-BR') + (amount === 1 ? ' metal' : ' metais');
+}
+
+function getMetalPayPerRoute() {
+  var vip = document.getElementById('metal-vip').value;
+  if (vip === 'gold') return 800;
+  return Math.max(0, Math.floor(Number(document.getElementById('metal-custom-pay').value) || 0));
+}
+
+function updateMetalVip() {
+  var custom = document.getElementById('metal-vip').value === 'custom';
+  document.getElementById('metal-custom-row').style.display = custom ? 'block' : 'none';
+  calculateMetalRoutes();
+}
+
+function calculateMetalRoutes() {
+  var pay = getMetalPayPerRoute();
+  var target = Math.max(0, Math.floor(Number(document.getElementById('metal-target').value) || 0));
+  var neededRoutes = target > 0 && pay > 0 ? Math.ceil(target / pay) : 0;
+  var routeMetals = neededRoutes * pay;
+  var exchanges = target > 0 ? Math.ceil(target / 800) : 0;
+  var dirtyCashNeeded = exchanges * 2000;
+  var exchangeMetals = exchanges * 800;
+  var routeSurplus = Math.max(0, routeMetals - target);
+  var exchangeSurplus = Math.max(0, exchangeMetals - target);
+
+  document.getElementById('metal-needed').textContent = target > 0 && pay > 0 ? neededRoutes + (neededRoutes === 1 ? ' rota' : ' rotas') : '—';
+  document.getElementById('metal-needed-note').textContent = target > 0 && pay > 0 ? 'Considera ' + formatMetalQuantity(pay) + ' por rota.' : (pay > 0 ? 'Informe sua meta de metais.' : 'Informe quantos metais este VIP paga por rota.');
+  document.getElementById('metal-dirty-needed').textContent = target > 0 ? money(dirtyCashNeeded) : '—';
+  document.getElementById('metal-dirty-note').textContent = target > 0 ? exchanges + (exchanges === 1 ? ' troca completa de R$ 2.000.' : ' trocas completas de R$ 2.000.') : 'R$ 2.000 por troca completa de 800 metais.';
+  document.getElementById('metal-route-metals').textContent = target > 0 && pay > 0 ? formatMetalQuantity(routeMetals) : '—';
+  document.getElementById('metal-route-note').textContent = target > 0 && pay > 0 ? (routeSurplus ? 'Arredondando, sobram ' + formatMetalQuantity(routeSurplus) + '.' : 'Atinge exatamente a meta.') : 'Metais recebidos pelas rotas.';
+  document.getElementById('metal-exchange-metals').textContent = target > 0 ? formatMetalQuantity(exchangeMetals) : '—';
+  document.getElementById('metal-exchange-note').textContent = target > 0 ? (exchangeSurplus ? 'Arredondando, sobram ' + formatMetalQuantity(exchangeSurplus) + '.' : 'Atinge exatamente a meta.') : 'Metais recebidos pela troca.';
+}
+
+// ===== VENDAS =====
+function productUnitPrice(product, quantity) {
+  if (product.priceTiers && product.priceTiers.length) {
+    for (var i = 0; i < product.priceTiers.length; i++) {
+      var tier = product.priceTiers[i];
+      if (quantity >= tier.min && (tier.max === null || quantity <= tier.max)) return tier.price;
+    }
+    return product.priceTiers[product.priceTiers.length - 1].price;
+  }
+  return Number(product.price) || 0;
+}
+
+function renderPriceTiers(product) {
+  if (!product.priceTiers || !product.priceTiers.length) return '';
+  var html = '<div class="sale-tier-list">';
+  for (var i = 0; i < product.priceTiers.length; i++) {
+    var tier = product.priceTiers[i];
+    html += '<div class="sale-tier-row"><span>' + tier.label + '</span><strong>' + money(tier.price) + ' / un.</strong></div>';
+  }
+  return html + '</div>';
+}
+
+function renderProductCards(products, containerId, type) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  if (!products.length) {
+    container.innerHTML = '<div class="catalog-empty"><div class="catalog-empty-icon">📋</div><h3>Sem itens cadastrados</h3><p>O catálogo de armas não tem itens.</p></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < products.length; i++) {
+    var product = products[i];
+    var existingInput = document.getElementById('sale-qty-' + type + '-' + i);
+    var quantity = existingInput && Number(existingInput.value) > 0 ? Math.floor(Number(existingInput.value)) : 1;
+    var unitPrice = productUnitPrice(product, quantity);
+    html += '<div class="sale-card">' +
+      '<div class="sale-card-top"><div><div class="sale-tag">' + product.type + '</div><div class="sale-name">' + product.name + '</div></div>' +
+      '<div class="sale-icon">' + product.icon + '</div></div>' +
+      '<div class="sale-price">' + money(unitPrice) + '</div>' +
+      '<div class="sale-unit">preço aplicado por unidade</div>' + renderPriceTiers(product) +
+      '<div class="sale-controls"><div><label for="sale-qty-' + type + '-' + i + '">Quantidade</label>' +
+      '<input class="sale-qty" id="sale-qty-' + type + '-' + i + '" type="number" min="1" step="1" value="' + quantity + '" oninput="updateSaleTotal(\'' + type + '\',' + i + ')"></div>' +
+      '<button class="btn-primary" onclick="sellProduct(\'' + type + '\',' + i + ')">Registrar venda</button></div>' +
+      '<div class="sale-total" id="sale-total-' + type + '-' + i + '">Total desta venda: <strong>' + money(unitPrice * quantity) + '</strong></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+}
+
+var SALES_ITEMS = [
+  { name:'9MM', category:'Armas', kind:'range', minPrice:4000, maxPrice:5000, icon:'🔫' },
+  { name:'Desert Eagle', category:'Armas', kind:'range', minPrice:18000, maxPrice:22500, icon:'🔫' },
+  { name:'Shotgun', category:'Armas', kind:'range', minPrice:25000, maxPrice:31250, icon:'💥' },
+  { name:'Combat Shotgun', category:'Armas', kind:'range', minPrice:35000, maxPrice:43750, icon:'💥' },
+  { name:'MP5', category:'Armas', kind:'range', minPrice:7200, maxPrice:9000, icon:'🎯' },
+  { name:'M4', category:'Armas', kind:'range', minPrice:25000, maxPrice:31250, icon:'🎯' },
+  { name:'AK-47', category:'Armas', kind:'range', minPrice:13000, maxPrice:16250, icon:'🎯' },
+  { name:'Dinamite', category:'Armas', kind:'range', minPrice:2400, maxPrice:3750, icon:'🧨' },
+  { name:'Ervas', category:'Drogas', kind:'cap', maxPrice:150, icon:'🌿' },
+  { name:'Coca', category:'Drogas', kind:'cap', maxPrice:225, icon:'📦' },
+  { name:'Pedra', category:'Drogas', kind:'cap', maxPrice:300, icon:'🪨' },
+  { name:'Dinheiro sujo', category:'Dinheiro sujo', kind:'cash', rate:0.5, icon:'💵' },
+  { name:'Metais', category:'Metais', kind:'metal', rate:3.75, icon:'🪙' },
+  { name:'Lockpicks', category:'Ferramentas', kind:'tiers', icon:'🗝️', priceTiers:[
+    { min:1, max:4, price:45000, label:'1 a 4 unidades' },
+    { min:5, max:9, price:40000, label:'5 a 9 unidades' },
+    { min:10, max:null, price:38500, label:'10+ unidades' }
+  ] }
+];
+function dwWeaponLabel(item) {
+  if (item.name === 'Desert Eagle') return 'desert';
+  return item.name.toLowerCase();
+}
+
+function renderDwWeapons() {
+  var container = document.getElementById('dw-weapons');
+  if (!container || container.getAttribute('data-ready') === 'true') return;
+  var weapons = SALES_ITEMS.filter(function(item) { return item.category === 'Armas'; });
+  var html = '';
+  for (var i = 0; i < weapons.length; i++) {
+    var label = dwWeaponLabel(weapons[i]);
+    html += '<label class="dw-weapon-option"><input class="dw-weapon-check" type="checkbox" value="' + escapeHtml(label) + '" onchange="updateDwAnnouncement()"><span>' + escapeHtml(weapons[i].name) + '</span></label>';
+  }
+  container.innerHTML = html;
+  container.setAttribute('data-ready', 'true');
+  updateDwAnnouncement();
+}
+
+function getSelectedDwWeapons() {
+  var checks = document.querySelectorAll('.dw-weapon-check:checked');
+  var selected = [];
+  for (var i = 0; i < checks.length; i++) selected.push(checks[i].value);
+  return selected;
+}
+
+function updateDwAnnouncement() {
+  var output = document.getElementById('dw-output');
+  if (!output) return;
+  var selected = getSelectedDwWeapons();
+  var type = document.getElementById('dw-type').value;
+  var status = document.getElementById('dw-state').value;
+  var message = document.getElementById('dw-message').value.trim();
+  var command = selected.length ? '/dw ' + type + ' ' + status + ' ' + selected.join(' ') : '';
+  output.value = command ? command + (message ? ' // ' + message : '') : '';
+  document.getElementById('dw-copy').disabled = selected.length === 0;
+  var statusNode = document.getElementById('dw-status');
+  if (statusNode) statusNode.textContent = '';
+}
+
+function setAllDwWeapons(checked) {
+  var checks = document.querySelectorAll('.dw-weapon-check');
+  for (var i = 0; i < checks.length; i++) checks[i].checked = checked;
+  updateDwAnnouncement();
+}
+
+function copyDwAnnouncement() {
+  var output = document.getElementById('dw-output');
+  var statusNode = document.getElementById('dw-status');
+  if (!output || !output.value) return;
+  function fallbackCopy() {
+    output.focus();
+    output.select();
+    var copied = false;
+    try { copied = document.execCommand('copy'); } catch (error) { copied = false; }
+    statusNode.textContent = copied ? 'Copiado! Agora cole no chat do jogo.' : 'Texto selecionado; toque e segure para copiar.';
+  }
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    navigator.clipboard.writeText(output.value).then(function() {
+      statusNode.textContent = 'Copiado! Agora cole no chat do jogo.';
+    }).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+}
+
+var salesQuoteQuantities = [];
+var salesQuotePrices = [];
+
+function quoteQuantityInput(item, i, quantity) {
+  var moneyValue = item.kind === 'cash';
+  var label = moneyValue ? 'Valor bruto (R$)' : 'Quantidade';
+  var step = moneyValue ? '0.01' : '1';
+  return '<div class="quote-field"><label for="quote-qty-' + i + '">' + label + '</label>' +
+    '<input class="quote-qty" id="quote-qty-' + i + '" type="number" min="0" step="' + step + '" value="' + quantity + '" oninput="updateSalesQuote()"></div>';
+}
+
+function quoteUnitEditor(item, i, quantity, unit) {
+  if (item.kind === 'range' || item.kind === 'cap') {
+    var min = item.kind === 'range' ? item.minPrice : 0;
+    var max = item.kind === 'range' ? item.maxPrice : item.maxPrice;
+    return '<div class="quote-field"><label for="quote-price-' + i + '">Preço usado/un.</label>' +
+      '<input class="quote-price-input" id="quote-price-' + i + '" type="number" min="' + min + '" max="' + max + '" step="1" value="' + unit + '" oninput="updateSalesQuote()"></div>';
+  }
+  var fixed = item.kind === 'cash' ? '50% do bruto' : (item.kind === 'metal' ? money(item.rate) + ' / metal' : (item.kind === 'tiers' ? money(unit) + ' / un. (por faixa)' : '—'));
+  return '<div class="quote-field"><label>Preço aplicado</label><div class="quote-fixed-price" id="quote-fixed-' + i + '">' + fixed + '</div></div>';
+}
+
+function salesUnitLabel(item, quantity) {
+  if (item.kind === 'range') return money(item.minPrice) + ' a ' + money(item.maxPrice) + ' / un.';
+  if (item.kind === 'cap') return 'Até ' + money(item.maxPrice) + ' / un.';
+  if (item.kind === 'cash') return 'Recebe 50% do valor informado';
+  if (item.kind === 'metal') return money(item.rate) + ' por metal';
+  var unit = productUnitPrice(item, Math.max(1, quantity));
+  return item.priceTiers.map(function(t) { return t.label + ': ' + money(t.price); }).join(' • ') + ' / un.';
+}
+
+function renderSalesQuote() {
+  var container = document.getElementById('quote-items');
+  if (!container) return;
+  var html = '';
+  for (var i = 0; i < SALES_ITEMS.length; i++) {
+    var item = SALES_ITEMS[i];
+    var oldQty = document.getElementById('quote-qty-' + i);
+    var quantity = oldQty ? Number(oldQty.value) || 0 : (Number(salesQuoteQuantities[i]) || 0);
+    if (item.kind !== 'cash') quantity = Math.max(0, Math.floor(quantity));
+    salesQuoteQuantities[i] = quantity;
+    var defaultPrice = item.kind === 'range' ? item.minPrice : (item.kind === 'cap' ? item.maxPrice : productUnitPrice(item, Math.max(1, quantity)));
+    var oldPrice = document.getElementById('quote-price-' + i);
+    var unit = oldPrice ? Number(oldPrice.value) : (Number(salesQuotePrices[i]) || defaultPrice);
+    if (!isFinite(unit)) unit = defaultPrice;
+    salesQuotePrices[i] = unit;
+    html += '<div class="quote-row">' +
+      '<div><span class="quote-category">' + item.category + '</span><div class="quote-item-name">' + item.icon + ' ' + item.name + '</div></div>' +
+      '<div class="quote-item-price" id="quote-rule-' + i + '">' + salesUnitLabel(item, quantity) + '</div>' +
+      quoteQuantityInput(item, i, quantity) + quoteUnitEditor(item, i, quantity, unit) +
+      '<div class="quote-line-total" id="quote-line-' + i + '">' + money(0) + '</div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+  updateSalesQuote();
+}
+
+function updateSalesQuote() {
+  var grandTotal = 0;
+  for (var i = 0; i < SALES_ITEMS.length; i++) {
+    var item = SALES_ITEMS[i];
+    var quantityInput = document.getElementById('quote-qty-' + i);
+    var quantity = quantityInput ? (Number(quantityInput.value) || 0) : (Number(salesQuoteQuantities[i]) || 0);
+    if (item.kind !== 'cash') quantity = Math.max(0, Math.floor(quantity));
+    salesQuoteQuantities[i] = quantity;
+    var unit = item.kind === 'range' ? item.minPrice : (item.kind === 'cap' ? item.maxPrice : productUnitPrice(item, Math.max(1, quantity)));
+    var priceInput = document.getElementById('quote-price-' + i);
+    if (priceInput) {
+      unit = Number(priceInput.value);
+      if (!isFinite(unit)) unit = item.kind === 'range' ? item.minPrice : 0;
+      var min = item.kind === 'range' ? item.minPrice : 0;
+      var max = item.kind === 'range' ? item.maxPrice : item.maxPrice;
+      unit = Math.min(max, Math.max(min, unit));
+      if (Number(priceInput.value) !== unit) priceInput.value = unit;
+    }
+    salesQuotePrices[i] = unit;
+    var subtotal = 0;
+    if (item.kind === 'cash') subtotal = quantity * item.rate;
+    else if (item.kind === 'metal') subtotal = quantity * item.rate;
+    else subtotal = quantity * unit;
+    grandTotal += subtotal;
+    var line = document.getElementById('quote-line-' + i);
+    if (line) line.textContent = item.kind === 'cash' ? money(subtotal) + ' (50%)' : money(subtotal);
+    var rule = document.getElementById('quote-rule-' + i);
+    if (rule) rule.textContent = salesUnitLabel(item, quantity);
+    var fixed = document.getElementById('quote-fixed-' + i);
+    if (fixed && item.kind === 'tiers') fixed.textContent = money(unit) + ' / un. (por faixa)';
+  }
+  var total = document.getElementById('quote-grand-total');
+  if (total) total.textContent = money(grandTotal);
+  return grandTotal;
+}
+
+function resetSalesQuote() {
+  salesQuoteQuantities = [];
+  salesQuotePrices = [];
+  renderSalesQuote();
+}
+
+function registerSalesQuote() {
+  var rows = [];
+  var total = 0;
+  for (var i = 0; i < SALES_ITEMS.length; i++) {
+    var item = SALES_ITEMS[i];
+    var quantity = Number(salesQuoteQuantities[i]) || 0;
+    if (!quantity) continue;
+    var unit = Number(salesQuotePrices[i]) || 0;
+    var amount;
+    if (item.kind === 'cash' || item.kind === 'metal') amount = quantity * item.rate;
+    else amount = quantity * unit;
+    if (!amount) continue;
+    total += amount;
+    rows.push(item.name + (item.kind === 'cash' ? ' — bruto ' + money(quantity) + ', venda ' + money(amount) : ' x ' + quantity + ' = ' + money(amount)));
+  }
+  if (!rows.length) { toast('Informe ao menos um item!', true); return; }
+  var org = document.getElementById('quote-org') ? document.getElementById('quote-org').value : 'Máfia';
+  salesQuoteQuantities = [];
+  salesQuotePrices = [];
+  addRecord('Venda • ' + org, total, rows.join(' • '));
+}
+
+function renderSalesCatalogs() {
+  renderSalesQuote();
+}
+
+function updateSaleTotal(type, index) {
+  var products = WEAPON_PRODUCTS;
+  var product = products[index];
+  var input = document.getElementById('sale-qty-' + type + '-' + index);
+  var output = document.getElementById('sale-total-' + type + '-' + index);
+  if (!product || !input || !output) return;
+  var quantity = Math.max(0, Math.floor(Number(input.value) || 0));
+  var unitPrice = productUnitPrice(product, Math.max(1, quantity));
+  var totalPrice = unitPrice * quantity;
+  var negotiation = product.priceTiers && quantity >= 10 ? ' <span>(volumes maiores: valor negociável)</span>' : '';
+  output.innerHTML = 'Preço: <strong>' + money(unitPrice) + ' / un.</strong> • Total: <strong>' + money(totalPrice) + '</strong>' + negotiation;
+}
+
+function sellProduct(type, index) {
+  var products = WEAPON_PRODUCTS;
+  var product = products[index];
+  var input = document.getElementById('sale-qty-' + type + '-' + index);
+  if (!product || !input) return;
+  var quantity = Math.floor(Number(input.value));
+  if (!quantity || quantity < 1) { toast('Informe uma quantidade valida!'); return; }
+  var unitPrice = productUnitPrice(product, quantity);
+  var amount = unitPrice * quantity;
+  var note = quantity + ' unidade(s) • ' + money(unitPrice) + ' cada';
+  if (product.priceTiers && quantity >= 10) note += ' • volume negociável';
+  if (addRecord('Venda: ' + product.name, amount, note)) {
+    var refreshedInput = document.getElementById('sale-qty-' + type + '-' + index);
+    if (refreshedInput) refreshedInput.value = 1;
+    updateSaleTotal(type, index);
+  }
+}
+
+// ===== HISTORICO =====
+function clearHistory() {
+  if (confirm('Apagar historico? Saldos nao mudam.')) {
+    state.history = []; state.earned = 0; save();
+  }
+}
+
+// ===== RENDER =====
+function render() {
+  var t = total();
+  var meta = state.meta || 0;
+  var pct = meta > 0 ? Math.min(100, (t / meta) * 100) : 0;
+  var missing = Math.max(0, meta - t);
+
+  document.getElementById('hero-total').textContent = money(t);
+  document.getElementById('hero-title').textContent = meta ? 'Progresso da Meta' : 'Defina sua Meta';
+  document.getElementById('hero-label').textContent = meta ? 'Meta atual' : 'Bem-vindo';
+  document.getElementById('stat-bank').textContent = money(state.bank);
+  document.getElementById('stat-cash').textContent = money(state.cash);
+  document.getElementById('stat-earned').textContent = money(state.earned);
+  document.getElementById('stat-missing').textContent = meta ? money(missing) : '—';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct.toFixed(1).replace('.', ',') + '%';
+  document.getElementById('meta-info').textContent = meta ? 'Meta: ' + money(meta) : 'Defina abaixo';
+
+  // Job dropdowns
+  var quickSel = document.getElementById('quick-job');
+  var regSel = document.getElementById('reg-job-select');
+  var opts = '';
+  for (var i = 0; i < state.jobs.length; i++) {
+    opts += '<option value="' + escapeHtml(state.jobs[i].name) + '">' + escapeHtml(state.jobs[i].name) + '</option>';
+  }
+  quickSel.innerHTML = opts;
+  regSel.innerHTML = opts;
+
+  // Job list
+  var jobHtml = '';
+  for (var j = 0; j < state.jobs.length; j++) {
+    jobHtml += '<div class="job-item">' +
+      '<div><div class="job-item-name">' + escapeHtml(state.jobs[j].name) + '</div>' +
+      '<div class="job-item-val">' + escapeHtml(state.jobs[j].value) + '</div></div>' +
+      '<button class="job-del" onclick="removeJob(' + j + ')">X</button>' +
+      '</div>';
+  }
+  document.getElementById('job-list').innerHTML = jobHtml || '<div class="empty">Nenhum emprego.</div>';
+
+  // Routine
+  var routineHtml = '';
+  for (var r = 0; r < DEFAULT_ROUTINE.length; r++) {
+    routineHtml += '<div class="routine-item">' +
+      '<span class="routine-time">' + DEFAULT_ROUTINE[r].time + '</span>' +
+      '<span class="routine-name">' + escapeHtml(DEFAULT_ROUTINE[r].name) + '</span>' +
+      '<span class="routine-pay">' + escapeHtml(DEFAULT_ROUTINE[r].pay) + '</span></div>';
+  }
+  document.getElementById('routine-list').innerHTML = routineHtml;
+
+  // History
+  var histHtml = '';
+  if (state.history.length === 0) {
+    histHtml = '<div class="empty">Nenhum registro ainda.</div>';
+  } else {
+    for (var h = 0; h < state.history.length; h++) {
+      var item = state.history[h];
+      histHtml += '<div class="history-item">' +
+        '<div class="history-top"><span class="history-name">' + escapeHtml(item.job) + '</span>' +
+        '<span class="history-amount">+' + money(item.amount) + '</span></div>' +
+        '<div class="history-meta">' + escapeHtml(item.note || '') + (item.destination ? ' • Destino: ' + escapeHtml(item.destination) : '') + ' • ' + escapeHtml(item.date || '') + '</div></div>';
+    }
+  }
+  document.getElementById('history-list').innerHTML = histHtml;
+
+  // Exibe somente sessões da data local de hoje.
+  var today = new Date().toDateString();
+  var todaysSessions = state.sessions.filter(function(session) {
+    var sessionDate = Number(session.timestamp) > 0 ? new Date(Number(session.timestamp)) : parsePtBrDate(session.date);
+    return sessionDate && sessionDate.toDateString() === today;
+  });
+  var sessHtml = '';
+  if (todaysSessions.length === 0) {
+    sessHtml = '<div class="empty">Nenhuma sessão de hoje.</div>';
+  } else {
+    for (var s = 0; s < todaysSessions.length; s++) {
+      sessHtml += '<div class="history-item">' +
+        '<div class="history-top"><span class="history-name">Sessão de jogo</span>' +
+        '<span class="history-amount" style="color:var(--purple)">' + formatTime(todaysSessions[s].duration) + '</span></div>' +
+        '<div class="history-meta">' + escapeHtml(todaysSessions[s].date || '') + '</div></div>';
+    }
+  }
+  document.getElementById('sessions-list').innerHTML = sessHtml;
+
+  renderSalesCatalogs();
+  renderDwWeapons();
+  updateTimerDisplay();
+}
+
+// ===== CLOCK =====
+function tickClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+// ===== NAV =====
+var navBtns = document.querySelectorAll('.nav-btn');
+for (var n = 0; n < navBtns.length; n++) {
+  navBtns[n].addEventListener('click', function() {
+    for (var i = 0; i < navBtns.length; i++) navBtns[i].classList.remove('active');
+    this.classList.add('active');
+    var pages = document.querySelectorAll('.tab-page');
+    for (var p = 0; p < pages.length; p++) pages[p].classList.remove('active');
+    document.getElementById('page-' + this.getAttribute('data-page')).classList.add('active');
+  });
+}
+
+// Subabas da área Mafia
+var mafiaTabs = document.querySelectorAll('.mafia-tab');
+for (var mt = 0; mt < mafiaTabs.length; mt++) {
+  mafiaTabs[mt].addEventListener('click', function() {
+    for (var mi = 0; mi < mafiaTabs.length; mi++) mafiaTabs[mi].classList.remove('active');
+    this.classList.add('active');
+    var selected = this.getAttribute('data-mafia-tab');
+    var panels = document.querySelectorAll('.mafia-panel');
+    for (var mp = 0; mp < panels.length; mp++) panels[mp].classList.toggle('active', panels[mp].id === 'mafia-panel-' + selected);
+  });
+}
+
+// Retoma o cronômetro sem redefinir o horário inicial salvo.
+if (state.timerRunning) {
+  if (!state.timerStartedAt) state.timerStartedAt = Date.now();
+  state.timerInterval = setInterval(updateTimerDisplay, 1000);
+}
+
+render();
+</script>
+</body>
+</html>
